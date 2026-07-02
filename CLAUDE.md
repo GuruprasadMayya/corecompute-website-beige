@@ -74,15 +74,25 @@ check these three blocks are still in sync:
 If you add a fourth dark-on-light-site element, follow the same pattern:
 scope a light-text override rather than flipping the global tokens.
 
-### Logo: the real corecompute.ae logo, not the SVG mark
+### Logo: the real corecompute.ae logo, true colors, white card
 
-Unlike the dark variant (which uses an original hand-drawn SVG "circuit-C"
-mark), this variant uses the **actual scraped corecompute.ae logo**
-(`assets/images/logo.png`, plus `logo-source.jpeg`) — per explicit
-instruction to use their real logo here. It sits in a small white card
-(`.brand-mark`) in the nav/footer since the source image has a white
-background baked in as a raster JPEG-derived PNG; the card gives it a
-clean edge against the cream page rather than an odd rectangular seam.
+This variant uses the **actual scraped corecompute.ae logo**
+(`assets/images/logo.png`, plus `logo-source.jpeg`) in its true dark-green
+/ sage-green brand colors — per explicit instruction to use their real logo
+here. It sits in a small white card (`.brand-mark`) in the nav/footer since
+the source image has a white background baked in as a raster JPEG-derived
+PNG; the card gives it a clean edge against the cream page rather than an
+odd rectangular seam.
+
+The dark variant (`../CoreComputeWebsite/`) also now uses this same real
+logo (not a hand-drawn substitute as in an earlier pass), but as a
+pixel-accurate *transparent, recolored* cutout (blue/amber, no card
+needed) rather than the true-color raster-in-a-card approach used here —
+see that variant's `CLAUDE.md` for the extraction technique. The two
+variants deliberately differ on this: beige keeps true brand color (reads
+fine on a light card), dark recolors to its own accent palette (true green
+would clash against the blue/amber theme). Don't "fix" one to match the
+other.
 
 `assets/images/favicon.png` is still an original procedurally-generated
 mark (small circuit-ring glyph, navy/gold), not derived from the real
