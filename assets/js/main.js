@@ -240,6 +240,170 @@
 
   document.querySelectorAll("[data-network-canvas]").forEach(initNetworkCanvas);
 
+  /* --------------------------- Brain data-flow canvas --------------------------- */
+  function initBrainFlowCanvas(canvas) {
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    let width, height, dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let brainNodes = [], brainEdges = [], particles = [], animationFrame;
+
+    function buildBrain() {
+      brainNodes = [];
+      const cx = width * 0.74;
+      const cy = height * 0.42;
+      const baseR = Math.min(width * 0.5, height) * 0.2;
+      const ringCount = 26;
+      for (let i = 0; i < ringCount; i++) {
+        const t = (i / ringCount) * Math.PI * 2;
+        const wobble = 1 + 0.22 * Math.sin(3 * t + 0.4) + 0.13 * Math.sin(7 * t + 1.2) + 0.08 * Math.sin(2 * t);
+        const r = baseR * wobble;
+        brainNodes.push({ x: cx + Math.cos(t) * r, y: cy + Math.sin(t) * r * 0.82, pulse: 0 });
+      }
+      for (let i = 0; i < 14; i++) {
+        const t = Math.random() * Math.PI * 2;
+        const r = baseR * (0.15 + Math.random() * 0.55);
+        brainNodes.push({ x: cx + Math.cos(t) * r, y: cy + Math.sin(t) * r * 0.82, pulse: 0 });
+      }
+      brainEdges = [];
+      for (let i = 0; i < brainNodes.length; i++) {
+        const dists = brainNodes
+          .map((n, j) => [j, Math.hypot(n.x - brainNodes[i].x, n.y - brainNodes[i].y)])
+          .filter(([j]) => j !== i)
+          .sort((a, b) => a[1] - b[1]);
+        for (let k = 0; k < 2; k++) {
+          const j = dists[k][0];
+          if (j > i) brainEdges.push([i, j]);
+        }
+      }
+    }
+
+    function spawnParticle() {
+      const edge = Math.floor(Math.random() * 4);
+      let sx, sy;
+      if (edge === 0) { sx = 0; sy = Math.random() * height; }
+      else if (edge === 1) { sx = width; sy = Math.random() * height; }
+      else if (edge === 2) { sx = Math.random() * width; sy = 0; }
+      else { sx = Math.random() * width; sy = height; }
+      const target = brainNodes[Math.floor(Math.random() * brainNodes.length)];
+      const cx = (sx + target.x) / 2 + (Math.random() - 0.5) * 180;
+      const cy = (sy + target.y) / 2 + (Math.random() - 0.5) * 180;
+      return {
+        sx, sy, cx, cy, tx: target.x, ty: target.y, targetNode: target,
+        t: 0, speed: 0.0035 + Math.random() * 0.004, trail: [],
+        isAmber: Math.random() < 0.15,
+      };
+    }
+
+    function bezierPoint(t, x0, y0, x1, y1, x2, y2) {
+      const mt = 1 - t;
+      return [mt * mt * x0 + 2 * mt * t * x1 + t * t * x2, mt * mt * y0 + 2 * mt * t * y1 + t * t * y2];
+    }
+
+    function drawStatic() {
+      ctx.clearRect(0, 0, width, height);
+      brainEdges.forEach(([i, j]) => {
+        const a = brainNodes[i], b = brainNodes[j];
+        ctx.strokeStyle = "rgba(95, 208, 255, 0.18)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      });
+      brainNodes.forEach((n) => {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(61, 139, 255, 0.55)";
+        ctx.fill();
+      });
+    }
+
+    function resize() {
+      width = canvas.clientWidth;
+      height = canvas.clientHeight;
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      buildBrain();
+      particles = Array.from({ length: 16 }, () => {
+        const p = spawnParticle();
+        p.t = Math.random();
+        return p;
+      });
+    }
+
+    function step() {
+      ctx.clearRect(0, 0, width, height);
+
+      brainEdges.forEach(([i, j]) => {
+        const a = brainNodes[i], b = brainNodes[j];
+        ctx.strokeStyle = "rgba(95, 208, 255, 0.18)";
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      });
+
+      brainNodes.forEach((n) => {
+        n.pulse *= 0.94;
+        const r = 2.2 + n.pulse * 4;
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+        ctx.fillStyle = n.pulse > 0.05 ? `rgba(255, 171, 64, ${0.5 + n.pulse * 0.5})` : "rgba(61, 139, 255, 0.55)";
+        ctx.fill();
+      });
+
+      particles.forEach((p, idx) => {
+        p.t += p.speed;
+        const [x, y] = bezierPoint(Math.min(p.t, 1), p.sx, p.sy, p.cx, p.cy, p.tx, p.ty);
+        p.trail.push([x, y]);
+        if (p.trail.length > 14) p.trail.shift();
+
+        for (let k = 0; k < p.trail.length; k++) {
+          const [tx, ty] = p.trail[k];
+          const alpha = (k / p.trail.length) * 0.5;
+          ctx.beginPath();
+          ctx.arc(tx, ty, 1.6, 0, Math.PI * 2);
+          ctx.fillStyle = p.isAmber ? `rgba(255, 171, 64, ${alpha})` : `rgba(95, 208, 255, ${alpha})`;
+          ctx.fill();
+        }
+
+        ctx.beginPath();
+        ctx.arc(x, y, 2.4, 0, Math.PI * 2);
+        ctx.fillStyle = p.isAmber ? "rgba(255, 196, 120, 0.95)" : "rgba(160, 220, 255, 0.95)";
+        ctx.fill();
+
+        if (p.t >= 1) {
+          p.targetNode.pulse = 1;
+          particles[idx] = spawnParticle();
+        }
+      });
+
+      animationFrame = requestAnimationFrame(step);
+    }
+
+    resize();
+    if (!prefersReducedMotion) {
+      step();
+    } else {
+      drawStatic();
+    }
+
+    let resizeTimer;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        cancelAnimationFrame(animationFrame);
+        resize();
+        if (!prefersReducedMotion) step();
+        else drawStatic();
+      }, 200);
+    });
+  }
+
+  document.querySelectorAll("[data-brain-flow]").forEach(initBrainFlowCanvas);
+
   /* ------------------------------- Contact form ------------------------------- */
   const form = document.querySelector("[data-contact-form]");
   if (form) {

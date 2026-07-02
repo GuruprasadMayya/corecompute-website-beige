@@ -12,11 +12,11 @@
   --accent-amber: #b08d57;
 
   /* Surfaces */
-  --bg-base: #f1e9d8;
-  --bg-raised: #e9dfc6;
-  --bg-raised-2: #ece1c7;
-  --bg-card: #fbf8f1;
-  --bg-glass: rgba(255, 252, 245, 0.6);
+  --bg-base: #f8f3e6;
+  --bg-raised: #f1ead8;
+  --bg-raised-2: #f4eeda;
+  --bg-card: #fdfbf6;
+  --bg-glass: rgba(255, 253, 248, 0.65);
 
   /* Borders */
   --border-subtle: rgba(30, 25, 15, 0.13);
@@ -369,6 +369,22 @@ select:focus-visible {
   color: var(--text-primary);
 }
 
+/* Pages whose hero/page-header is a dark photo need light nav text until scrolled */
+.has-dark-header .navbar:not(.is-scrolled) .brand-name,
+.has-dark-header .navbar:not(.is-scrolled) .nav-links a {
+  color: rgba(251, 246, 234, 0.75);
+}
+
+.has-dark-header .navbar:not(.is-scrolled) .nav-links a:hover,
+.has-dark-header .navbar:not(.is-scrolled) .nav-links a.is-active {
+  color: var(--text-on-accent);
+}
+
+.has-dark-header .navbar:not(.is-scrolled) .nav-toggle {
+  color: var(--text-on-accent);
+  border-color: rgba(251, 246, 234, 0.35);
+}
+
 .nav-links a:hover::after,
 .nav-links a.is-active::after {
   transform: scaleX(1);
@@ -453,14 +469,20 @@ select:focus-visible {
   padding-top: 140px;
   padding-bottom: var(--space-6);
   overflow: hidden;
-  background: radial-gradient(120% 90% at 50% -10%, #e7dcc0 0%, #f1e9d8 55%), var(--bg-base);
+  background:
+    linear-gradient(100deg, rgba(6, 7, 10, 0.95) 0%, rgba(6, 7, 10, 0.82) 32%, rgba(6, 7, 10, 0.5) 62%, rgba(6, 7, 10, 0.68) 100%),
+    url("../images/photo-dc-hall-bg.jpg");
+  background-size: cover;
+  background-position: center;
 }
 
 .hero-canvas {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: 0;
-  opacity: 0.65;
+  opacity: 0.9;
 }
 
 .hero-glow {
@@ -469,64 +491,18 @@ select:focus-visible {
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(600px 400px at 15% 20%, rgba(47, 92, 134, 0.12), transparent 60%),
-    radial-gradient(500px 380px at 85% 70%, rgba(176, 141, 87, 0.1), transparent 60%);
+    radial-gradient(600px 400px at 12% 15%, rgba(47, 92, 134, 0.1), transparent 60%),
+    radial-gradient(500px 380px at 88% 70%, rgba(176, 141, 87, 0.08), transparent 60%);
 }
 
 .hero .container {
   position: relative;
   z-index: 2;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
 }
 
 .hero-inner {
   max-width: 780px;
   min-width: 0;
-}
-
-.hero-visual {
-  position: relative;
-  flex-shrink: 0;
-  width: 400px;
-  aspect-ratio: 4 / 4.9;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--border-accent);
-  box-shadow: var(--shadow-soft);
-}
-
-.hero-visual::before {
-  content: "";
-  position: absolute;
-  inset: -18%;
-  background: radial-gradient(circle, rgba(47, 92, 134, 0.28), transparent 65%);
-  pointer-events: none;
-  z-index: -1;
-}
-
-.hero-visual img {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.hero-visual::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(190deg, rgba(6, 7, 10, 0) 45%, rgba(6, 7, 10, 0.5));
-  pointer-events: none;
-}
-
-@media (max-width: 1180px) {
-  .hero-visual {
-    display: none;
-  }
 }
 
 .hero-kicker {
@@ -603,6 +579,45 @@ select:focus-visible {
   margin-top: 4px;
 }
 
+/* Hero sits on a dark photo regardless of site theme — force light text */
+.hero-kicker {
+  color: var(--accent-ice);
+  border-color: rgba(183, 207, 224, 0.35);
+  background: rgba(251, 246, 234, 0.08);
+}
+
+.hero-kicker .dot {
+  background: var(--accent-ice);
+  box-shadow: 0 0 0 4px rgba(183, 207, 224, 0.2);
+}
+
+.hero h1 {
+  color: var(--text-on-accent);
+}
+
+.hero-sub {
+  color: rgba(251, 246, 234, 0.78);
+}
+
+.hero-meta-item .num {
+  color: var(--text-on-accent);
+}
+
+.hero-meta-item .label {
+  color: rgba(251, 246, 234, 0.6);
+}
+
+.hero .btn-secondary {
+  background: rgba(251, 246, 234, 0.06);
+  color: var(--text-on-accent);
+  border-color: rgba(251, 246, 234, 0.35);
+}
+
+.hero .btn-secondary:hover {
+  border-color: var(--accent-amber);
+  color: var(--accent-amber);
+}
+
 @media (max-width: 720px) {
   .hero {
     padding-top: 120px;
@@ -619,9 +634,27 @@ select:focus-visible {
   position: relative;
   padding-top: 170px;
   padding-bottom: var(--space-6);
-  background: radial-gradient(120% 100% at 50% -20%, #e7dcc0 0%, #f1e9d8 60%), var(--bg-base);
+  background: radial-gradient(120% 100% at 50% -20%, #eee5cf 0%, #f8f3e6 60%), var(--bg-base);
   overflow: hidden;
   border-bottom: 1px solid var(--border-subtle);
+}
+
+.page-header--cabling {
+  background:
+    linear-gradient(100deg, rgba(6, 7, 10, 0.94) 0%, rgba(6, 7, 10, 0.82) 40%, rgba(6, 7, 10, 0.6) 100%),
+    url("../images/photo-fiber-cabling.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.page-header--cabling h1,
+.page-header--cabling .breadcrumb,
+.page-header--cabling .breadcrumb a {
+  color: var(--text-on-accent);
+}
+
+.page-header--cabling p {
+  color: rgba(251, 246, 234, 0.78);
 }
 
 .page-header .container {
@@ -632,6 +665,8 @@ select:focus-visible {
 .page-header-canvas {
   position: absolute;
   inset: 0;
+  width: 100%;
+  height: 100%;
   opacity: 0.4;
 }
 
