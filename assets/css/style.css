@@ -326,6 +326,11 @@ select:focus-visible {
   margin-bottom: 10px;
 }
 
+.footer-brand .brand-name {
+  display: inline-block;
+  margin-bottom: 4px;
+}
+
 .brand-name {
   font-family: var(--font-display);
   font-weight: 700;
@@ -871,6 +876,64 @@ select:focus-visible {
 
 /* -------------------------------- Stats bar ------------------------------- */
 
+/* -------------------------------- Profile card ------------------------------- */
+
+.profile-card {
+  display: flex;
+  gap: var(--space-4);
+  align-items: flex-start;
+  max-width: 800px;
+  margin-inline: auto;
+  background: linear-gradient(180deg, var(--bg-card), var(--bg-raised));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+}
+
+.profile-avatar {
+  flex-shrink: 0;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.6rem;
+  background: linear-gradient(135deg, rgba(47, 92, 134, 0.14), rgba(176, 141, 87, 0.12));
+  border: 1px solid var(--border-accent);
+  color: var(--blue-bright);
+}
+
+.profile-info h3 {
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+}
+
+.profile-title {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--blue-bright);
+  margin-bottom: 12px;
+}
+
+.profile-info p {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 640px) {
+  .profile-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
 .stats-bar {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1178,24 +1241,43 @@ select:focus-visible {
   flex-wrap: wrap;
   justify-content: center;
   align-items: center;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
 .logo-marquee .partner {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.95rem;
-  letter-spacing: 0.02em;
-  color: var(--text-tertiary);
-  opacity: 0.65;
-  filter: grayscale(1);
-  transition: opacity 0.3s ease, filter 0.3s ease, color 0.3s ease;
+  display: flex;
+  align-items: center;
+  height: 30px;
 }
 
-.logo-marquee .partner:hover {
+.logo-marquee .partner img {
+  height: 100%;
+  width: auto;
+  max-width: 130px;
+  object-fit: contain;
+  opacity: 0.55;
+  filter: brightness(0);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.logo-marquee .partner img:hover {
   opacity: 1;
-  filter: grayscale(0);
-  color: var(--text-primary);
+  filter: none;
+}
+
+/* Supermicro (white text reversed out of a solid fill) and Microsoft
+   (four edge-to-edge squares distinguished only by color, no gap between
+   them) both lose all internal definition under a flat monochrome filter
+   — they keep their natural colors instead of the silhouette treatment. */
+.logo-marquee .partner img[src*="supermicro"],
+.logo-marquee .partner img[src*="microsoft"] {
+  filter: none;
+  opacity: 0.85;
+}
+
+.logo-marquee .partner img[src*="supermicro"]:hover,
+.logo-marquee .partner img[src*="microsoft"]:hover {
+  opacity: 1;
 }
 
 .footer-bottom {
